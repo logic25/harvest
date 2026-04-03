@@ -70,6 +70,11 @@ def run_bot():
 
     try:
         log.info(f"Building Telegram app with token: {config.TELEGRAM_TOKEN[:10]}...")
+
+        # Create a new event loop for this thread (required in Python 3.10+)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
         app = Application.builder().token(config.TELEGRAM_TOKEN).build()
         app.add_handler(CommandHandler("start", start))
         app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
