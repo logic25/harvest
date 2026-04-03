@@ -65,12 +65,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def run_bot():
     """Start the Telegram bot."""
     if not config.TELEGRAM_TOKEN:
-        log.error("TELEGRAM_TOKEN not set")
+        log.error("TELEGRAM_TOKEN not set — bot cannot start")
         return
 
-    app = Application.builder().token(config.TELEGRAM_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    try:
+        log.info(f"Building Telegram app with token: {config.TELEGRAM_TOKEN[:10]}...")
+        app = Application.builder().token(config.TELEGRAM_TOKEN).build()
+        app.add_handler(CommandHandler("start", start))
+        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    log.info("Harvest bot starting...")
-    app.run_polling(drop_pending_updates=True)
+        log.info("Harvest bot starting polling...")
+        app.run_polling(drop_pending_updates=True)
+    except Exception as e:
+        log.error(f"Harvest bot CRASHED: {e}", exc_info=True)
