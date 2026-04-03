@@ -1,5 +1,5 @@
 """
-Harvest Server — runs the Telegram bot + Flask health check.
+Harvest Server — runs the Telegram bot (main thread) + Flask health check (background).
 """
 import threading
 import logging
@@ -26,10 +26,13 @@ def health():
 
 
 if __name__ == "__main__":
-    # Start Telegram bot in background thread
-    bot_thread = threading.Thread(target=run_bot, daemon=True)
-    bot_thread.start()
-    log.info("Telegram bot started in background")
+    # Start Flask in background thread (health check only)
+    flask_thread = threading.Thread(
+        target=lambda: app.run(host="0.0.0.0", port=config.PORT, use_reloader=False),
+        daemon=True,
+    )
+    flask_thread.start()
+    log.info(f"Flask health check started on port {config.PORT}")
 
-    # Start Flask for health check
-    app.run(host="0.0.0.0", port=config.PORT)
+    # Run Telegram bot in main thread (needs signal handlers)
+    run_bot()
