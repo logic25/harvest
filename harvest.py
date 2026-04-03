@@ -11,31 +11,13 @@ import anthropic
 
 import config
 from agents import TOOLS, query_ordino, query_citisignal, get_morning_briefing
+from memory_store import load_memory, save_memory, append_conversation
 
 log = logging.getLogger("harvest")
 
 # Load SOUL.md
 SOUL_PATH = Path(__file__).parent / "soul.md"
 SOUL = SOUL_PATH.read_text() if SOUL_PATH.exists() else ""
-
-# Load memory
-MEMORY_PATH = Path(config.MEMORY_FILE)
-
-
-def load_memory() -> dict:
-    if MEMORY_PATH.exists():
-        try:
-            return json.loads(MEMORY_PATH.read_text())
-        except:
-            pass
-    return {"conversations": [], "patterns": [], "context_journal": []}
-
-
-def save_memory(memory: dict):
-    try:
-        MEMORY_PATH.write_text(json.dumps(memory, indent=2, default=str))
-    except Exception as e:
-        log.error(f"Failed to save memory: {e}")
 
 
 def build_system_prompt(memory: dict) -> str:
@@ -85,7 +67,7 @@ async def handle_tool_call(tool_name: str, tool_input: dict) -> str:
 
 async def chat(user_message: str, user_id: str = "manny") -> str:
     """Main conversation handler — sends message to Claude with tools."""
-    memory = load_memory()
+    memory = load_memory(agent_id="harvest")
     system_prompt = build_system_prompt(memory)
 
     client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY)
@@ -119,15 +101,8 @@ async def chat(user_message: str, user_id: str = "manny") -> str:
             text_parts = [b.text for b in response.content if hasattr(b, "text")]
             final_response = "\n".join(text_parts)
 
-            # Save to memory
-            memory.setdefault("conversations", []).append({
-                "user": user_message,
-                "assistant": final_response[:500],
-                "timestamp": datetime.now().isoformat(),
-            })
-            # Keep last 50 conversations
-            memory["conversations"] = memory["conversations"][-50:]
-            save_memory(memory)
+            # Save to memory (persistent via Supabase)
+            append_conversation("harvest", user_message, final_response)
 
             return final_response
 

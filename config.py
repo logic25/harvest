@@ -22,7 +22,14 @@ CITISIGNAL_API_KEY = os.getenv("CITISIGNAL_API_KEY", "")
 VENTURE_STUDIO_URL = os.getenv("VENTURE_STUDIO_URL", "")
 VENTURE_STUDIO_KEY = os.getenv("VENTURE_STUDIO_KEY", "")
 
-# Memory
+# Supabase (shared memory store for Harvest + Blooms Agent)
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
+
+# Memory (local fallback if Supabase unavailable)
 MEMORY_FILE = os.getenv("MEMORY_FILE", "/tmp/harvest_memory.json")
+
+# Heartbeat — Manny's Telegram chat ID for proactive messages
+MANNY_CHAT_ID = os.getenv("MANNY_CHAT_ID", "")
 
 PORT = int(os.getenv("PORT", "8080"))
