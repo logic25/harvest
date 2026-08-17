@@ -10,7 +10,7 @@ from datetime import datetime
 import anthropic
 
 import config
-from agents import TOOLS, query_ordino, query_citisignal, get_morning_briefing
+from agents import TOOLS, query_ordino, query_citisignal, get_morning_briefing, query_blooms
 from memory_store import load_memory, save_memory, append_conversation
 
 log = logging.getLogger("harvest")
@@ -53,6 +53,11 @@ async def handle_tool_call(tool_name: str, tool_input: dict) -> str:
             )
         elif tool_name == "query_citisignal":
             result = await query_citisignal(tool_input.get("property_id", ""))
+        elif tool_name == "query_blooms":
+            result = await query_blooms(
+                action=tool_input.get("action", "discover_schema"),
+                params=tool_input.get("params", {}),
+            )
         elif tool_name == "get_morning_briefing":
             result = await get_morning_briefing()
             return result  # Already a string

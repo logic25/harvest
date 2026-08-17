@@ -98,6 +98,11 @@ Located in North Merrick, NY — 1171 Merrick Ave. About 4 minutes from home.
 - Key hires needed: Part-time ops assistant ($1,600/month), BD coordinator via Simera ($1,800/month)
 - Vendors: Sweet Root Village (Amy, 979-777-5624, @BloomTrust), plus wholesale suppliers
 
+### Live Data (via query_blooms tool)
+- Financials, tasks, expenses, and valuations are queryable from Venture Studio Supabase
+- The numbers below (Crockett Myers 2025) serve as **baselines and targets** for comparison
+- Daily operations data (orders, inventory, vendors) will come from Blooms OS when connected
+
 ### What Manny Cares About with Blooms
 - Is the business healthy? (Revenue trends, COGS tracking, cash position)
 - Are initiatives on track? (50-task quarterly tracker, most behind schedule)

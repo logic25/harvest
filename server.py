@@ -31,6 +31,8 @@ def health():
         "status": "ok",
         "ordino_configured": bool(config.ORDINO_PROXY_URL),
         "citisignal_configured": bool(config.CITISIGNAL_API_URL),
+        "blooms_vs_configured": bool(config.VS_SUPABASE_URL),
+        "blooms_os_configured": bool(config.BLOOMS_SUPABASE_URL),
         "telegram_configured": bool(config.TELEGRAM_TOKEN),
         "heartbeat_configured": bool(config.MANNY_CHAT_ID),
         "heartbeat_jobs": heartbeat_jobs,

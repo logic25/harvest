@@ -56,14 +56,31 @@
 - Hold period tracking with alerts
 - V3 framework compliance
 
-### Blooms in Bunches
-**Status:** EMBEDDED KNOWLEDGE ONLY (no live data connection)
-**What Harvest knows:**
-- Revenue, COGS, financial targets (from Crockett Myers analysis in SOUL.md)
-- Team structure, operational challenges
-- Growth plan and initiative status
+### Blooms in Bunches — Venture Studio
+**Status:** CONNECTED (via Venture Studio Supabase)
+**What Harvest can query:**
+- `get_financials` — Revenue TTM, EBITDA, annual expenses, yearly financials (revenue, profit, owner salary)
+- `get_tasks` — Initiative tracker (50-task quarterly plan), status, priorities, due dates
+- `get_expenses` — Recurring and one-off expenses by category and date range
+- `get_valuation` — Valuation history (low/mid/high range, methodology)
+- `discover_schema` — List all tables and columns
+- `query_table` — General query against any table
 
-**Future:** Connect to Blooms OS Supabase for live data (orders, inventory, revenue)
+**Proxy:** Direct Supabase REST API (PostgREST)
+**Auth:** `apikey` + `Authorization: Bearer` headers
+**Env vars:** `VS_SUPABASE_URL`, `VS_SUPABASE_KEY`
+
+**Baselines (Crockett Myers 2025):** Revenue $842K, COGS 42.9% (target 34.4%), profit $41.7K
+
+### Blooms in Bunches — Blooms OS
+**Status:** PLANNED (Supabase project exists, tables not yet populated)
+**What it will provide:**
+- Product catalog, recipes, flower library
+- Daily orders, vendor orders, delivery tracking
+- Cooler inventory, shopping lists
+- Production planning for events
+
+**Env vars:** `BLOOMS_SUPABASE_URL`, `BLOOMS_SUPABASE_KEY`
 
 ### Google Sheets
 **Status:** NOT CONNECTED

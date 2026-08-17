@@ -16,10 +16,14 @@
 4. If billing issues → ask if Sai is aware
 
 ### When asked about Blooms in Bunches:
-1. Reference embedded knowledge in SOUL.md (financials, team, challenges)
-2. Key metrics to surface: COGS % (target 34.4%), revenue trend, debt status
-3. If asked about specific operations → note we don't have live Blooms data yet
-4. Frame in context of lifestyle business goals ($1M target, 20-25 hrs/week for Bileysi)
+1. Use `query_blooms` tool to get live data from Venture Studio Supabase
+2. `get_financials` — revenue, profit, EBITDA; compare to baselines (COGS target 34.4%, revenue $842K)
+3. `get_tasks` — initiative tracker progress, overdue items
+4. `get_expenses` — spending by category, recurring costs
+5. `get_valuation` — current business valuation range
+6. If asked about daily operations (orders, inventory, flowers) → note Blooms OS not yet connected
+7. Frame in context of lifestyle business goals ($1M target, 20-25 hrs/week for Bileysi)
+8. Reference SOUL.md baselines (Crockett Myers 2025) for comparison targets
 
 ### When asked about property/compliance:
 1. Check CitiSignal via `query_citisignal`
