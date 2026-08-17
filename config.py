@@ -16,6 +16,14 @@ BEACON_KEY = os.getenv("BEACON_KEY", "")
 ORDINO_PROXY_URL = os.getenv("ORDINO_PROXY_URL", "")  # Supabase edge function URL
 ORDINO_PROXY_KEY = os.getenv("ORDINO_PROXY_KEY", "")  # BEACON_ANALYTICS_KEY
 
+# Ordino Supabase auth — a real end-user JWT so beacon-data-proxy can derive
+# profiles.company_id (REQUIRED once BEACON_PROXY_ALLOW_SHARED_SECRET_ONLY flips
+# to 0). When these are unset, query_ordino falls back to shared-secret-only.
+ORDINO_SUPABASE_URL = os.getenv("ORDINO_SUPABASE_URL", "https://mimlfjkisguktiqqkpkm.supabase.co")
+ORDINO_ANON_KEY = os.getenv("ORDINO_ANON_KEY", "")          # Ordino public anon key (GoTrue login)
+HARVEST_ORDINO_EMAIL = os.getenv("HARVEST_ORDINO_EMAIL", "")       # dedicated Harvest bot user
+HARVEST_ORDINO_PASSWORD = os.getenv("HARVEST_ORDINO_PASSWORD", "")  # set in Railway (secret)
+
 CITISIGNAL_API_URL = os.getenv("CITISIGNAL_API_URL", "")
 CITISIGNAL_API_KEY = os.getenv("CITISIGNAL_API_KEY", "")
 

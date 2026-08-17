@@ -35,20 +35,65 @@ def read_roadmap_priorities() -> list[str]:
     return out
 
 
+# ── Ordino JWT (identifies Harvest as the GLE company to beacon-data-proxy) ──
+# Cached access token so we don't log in on every call. Supabase access tokens
+# are ~1h; we refresh a little early.
+_ordino_jwt: dict = {"token": None, "exp": 0.0}
+
+
+async def _get_ordino_jwt() -> str | None:
+    """Log into Ordino's Supabase as the Harvest bot user (GoTrue password grant),
+    cache the access token, refresh near expiry. Returns None (→ shared-secret-only
+    fallback) when the bot creds aren't configured."""
+    import time
+    if not (config.ORDINO_SUPABASE_URL and config.ORDINO_ANON_KEY
+            and config.HARVEST_ORDINO_EMAIL and config.HARVEST_ORDINO_PASSWORD):
+        return None
+    now = time.time()
+    if _ordino_jwt["token"] and now < _ordino_jwt["exp"] - 120:  # 2-min skew
+        return _ordino_jwt["token"]
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.post(
+                f"{config.ORDINO_SUPABASE_URL}/auth/v1/token?grant_type=password",
+                headers={"apikey": config.ORDINO_ANON_KEY, "Content-Type": "application/json"},
+                json={"email": config.HARVEST_ORDINO_EMAIL,
+                      "password": config.HARVEST_ORDINO_PASSWORD},
+            )
+        if resp.status_code != 200:
+            log.error(f"Ordino JWT login failed {resp.status_code}: {resp.text[:160]}")
+            return None
+        data = resp.json()
+        _ordino_jwt["token"] = data.get("access_token")
+        _ordino_jwt["exp"] = now + float(data.get("expires_in", 3600))
+        return _ordino_jwt["token"]
+    except Exception as e:
+        log.error(f"Ordino JWT login error: {e}")
+        return None
+
+
 async def query_ordino(action: str, params: dict = None) -> dict:
     """Query Ordino's data via the beacon-data-proxy edge function."""
     if not config.ORDINO_PROXY_URL or not config.ORDINO_PROXY_KEY:
         return {"error": "Ordino not configured"}
+
+    headers = {
+        "x-beacon-key": config.ORDINO_PROXY_KEY,
+        "Content-Type": "application/json",
+    }
+    # Forward a real Supabase JWT so the proxy derives company_id (required once
+    # BEACON_PROXY_ALLOW_SHARED_SECRET_ONLY is off). If unset, no header is added
+    # and the proxy uses the legacy shared-secret path (works while the flag is 1).
+    jwt = await _get_ordino_jwt()
+    if jwt:
+        headers["Authorization"] = f"Bearer {jwt}"
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             resp = await client.post(
                 config.ORDINO_PROXY_URL,
                 json={"action": action, "params": params or {}},
-                headers={
-                    "x-beacon-key": config.ORDINO_PROXY_KEY,
-                    "Content-Type": "application/json",
-                },
+                headers=headers,
             )
             if resp.status_code != 200:
                 return {"error": f"Ordino returned {resp.status_code}: {resp.text[:200]}"}
